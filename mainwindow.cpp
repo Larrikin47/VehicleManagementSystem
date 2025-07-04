@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QSqlQueryModel>
 #include <QSqlError>
+#include <QSqlQuery>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
@@ -121,6 +122,35 @@ void MainWindow::on_addCustomerButton_clicked() {
             QMessageBox::information(this, "Customer Added", "New customer added successfully.");
         } else {
             QMessageBox::warning(this, "Error", "Failed to add customer.");
+        }
+    }
+}
+
+// ✅ Delete a vehicle
+void MainWindow::on_deleteVehicleButton_clicked() {
+    QModelIndex currentIndex = ui->tableView->currentIndex();
+    if (!currentIndex.isValid()) {
+        QMessageBox::warning(this, "No Selection", "Please select a vehicle to delete.");
+        return;
+    }
+
+    int row = currentIndex.row();
+    int vehicleId = ui->tableView->model()->data(ui->tableView->model()->index(row, 0)).toInt();
+
+    QMessageBox::StandardButton confirm = QMessageBox::question(this, "Confirm Delete",
+                                                                "Are you sure you want to delete this vehicle?",
+                                                                QMessageBox::Yes | QMessageBox::No);
+
+    if (confirm == QMessageBox::Yes) {
+        QSqlQuery query(db);
+        query.prepare("DELETE FROM vehicles WHERE id = :id");
+        query.bindValue(":id", vehicleId);
+
+        if (!query.exec()) {
+            QMessageBox::critical(this, "Delete Failed", query.lastError().text());
+        } else {
+            QMessageBox::information(this, "Deleted", "Vehicle deleted successfully.");
+            refreshView();
         }
     }
 }

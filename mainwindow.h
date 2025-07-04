@@ -57,6 +57,12 @@ private slots:
      */
     void on_addCustomerButton_clicked();
 
+    /**
+     * @brief Triggered when the "Delete Vehicle" button is clicked.
+     * Deletes the selected vehicle from the database.
+     */
+    void on_deleteVehicleButton_clicked();  //  Added slot
+
 private:
     Ui::MainWindow *ui;   ///< Pointer to the UI layout
     QSqlDatabase db;      ///< SQLite database connection

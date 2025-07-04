@@ -30,17 +30,10 @@
       <x>410</x>
       <y>80</y>
       <width>160</width>
-      <height>124</height>
+      <height>156</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QPushButton" name="rentButton">
-       <property name="text">
-        <string>rent </string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="addVehicleButton">
        <property name="text">
@@ -48,17 +41,31 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QPushButton" name="refreshButton">
+     <item row="5" column="0">
+      <widget class="QPushButton" name="returnButton">
        <property name="text">
-        <string>refresh</string>
+        <string>return</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QPushButton" name="rentButton">
+       <property name="text">
+        <string>rent </string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QPushButton" name="returnButton">
+      <widget class="QPushButton" name="addCustomerButton">
        <property name="text">
-        <string>return</string>
+        <string>Add Customer</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QPushButton" name="deleteVehicleButton">
+       <property name="text">
+        <string>Delete vehicle</string>
        </property>
       </widget>
      </item>
@@ -77,19 +84,6 @@
      <string>DataLogs</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="addCustomerButton">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>230</y>
-      <width>131</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Add Customer</string>
-    </property>
-   </widget>
    <widget class="QTableView" name="rentalTableView">
     <property name="geometry">
      <rect>
@@ -100,17 +94,17 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="assignRentalButton">
+   <widget class="QPushButton" name="refreshButton">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>290</y>
-      <width>93</width>
+      <x>410</x>
+      <y>270</y>
+      <width>158</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>Assign Rental</string>
+     <string>refresh</string>
     </property>
    </widget>
   </widget>
