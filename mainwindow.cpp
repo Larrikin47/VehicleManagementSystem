@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include "addvehicledialog.h"
-#include "addcustomerdialog.h"        // ✅ New
+#include "addcustomerdialog.h"
+#include "addrentaldialog.h"
+
 #include "rentalmanager.h"
-#include "customermanager.h"          // ✅ New
+#include "customermanager.h"
 
 #include <QMessageBox>
 #include <QSqlQueryModel>
@@ -16,26 +19,20 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    // Initialize database connection
+    // Setup database
     db = QSqlDatabase::addDatabase("QSQLITE");
-
-    // Set database path to application directory
     QString dbPath = QCoreApplication::applicationDirPath() + "/rental.db";
     db.setDatabaseName(dbPath);
 
-    // Log the path for debugging
     qDebug() << "Database path:" << dbPath;
 
-    // Open the database and check for success
     if (!db.open()) {
-        QMessageBox::critical(this, "Database Error",
-                              "Failed to open the database:\n" + db.lastError().text());
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
         return;
     }
 
     qDebug() << "Database opened successfully.";
 
-    // Setup tables and display data
     setupDatabase();
     refreshView();
 }
@@ -45,22 +42,29 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+// ✅ Setup both Vehicle and Customer tables
 void MainWindow::setupDatabase() {
-    RentalManager mgr;
-    mgr.setDatabase(db);
-    mgr.createTable();
+    RentalManager rentalMgr;
+    rentalMgr.setDatabase(db);
+    rentalMgr.createTables(); // creates vehicles and rentals
 
-    CustomerManager cmgr;
-    cmgr.setDatabase(db);
-    cmgr.createTable();
+    CustomerManager custMgr;
+    custMgr.setDatabase(db);
+    custMgr.createTable(); // creates customers
 }
 
+// ✅ Refresh the vehicle view + optional rental view
 void MainWindow::refreshView() {
     RentalManager mgr;
     mgr.setDatabase(db);
     ui->tableView->setModel(mgr.getAllVehiclesModel());
+
+    if (ui->rentalTableView) {
+        ui->rentalTableView->setModel(mgr.getAllRentalsModel());
+    }
 }
 
+// ✅ Add a new vehicle
 void MainWindow::on_addVehicleButton_clicked() {
     AddVehicleDialog dlg(this);
     if (dlg.exec() == QDialog::Accepted) {
@@ -71,16 +75,26 @@ void MainWindow::on_addVehicleButton_clicked() {
     }
 }
 
+// ✅ Rent a vehicle to a customer
 void MainWindow::on_rentButton_clicked() {
-    int id = ui->tableView->model()->data(
-                                       ui->tableView->model()->index(ui->tableView->currentIndex().row(), 0)).toInt();
+    AddRentalDialog dlg(this);
+    if (dlg.exec() == QDialog::Accepted) {
+        RentalManager mgr;
+        mgr.setDatabase(db);
 
-    RentalManager mgr;
-    mgr.setDatabase(db);
-    mgr.updateVehicleStatus(id, "Rented");
-    refreshView();
+        int customerId = dlg.getSelectedCustomerId();
+        int vehicleId = dlg.getSelectedVehicleId();
+
+        if (mgr.registerRental(customerId, vehicleId)) {
+            QMessageBox::information(this, "Rental Success", "Rental recorded successfully.");
+            refreshView();
+        } else {
+            QMessageBox::warning(this, "Rental Failed", "Rental failed. Please check data.");
+        }
+    }
 }
 
+// ✅ Return a vehicle (mark as available)
 void MainWindow::on_returnButton_clicked() {
     int id = ui->tableView->model()->data(
                                        ui->tableView->model()->index(ui->tableView->currentIndex().row(), 0)).toInt();
@@ -91,11 +105,12 @@ void MainWindow::on_returnButton_clicked() {
     refreshView();
 }
 
+// ✅ Manual refresh
 void MainWindow::on_refreshButton_clicked() {
     refreshView();
 }
 
-// ✅ Add Customer Button logic
+// ✅ Add a new customer
 void MainWindow::on_addCustomerButton_clicked() {
     AddCustomerDialog dlg(this);
     if (dlg.exec() == QDialog::Accepted) {

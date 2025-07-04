@@ -17,8 +17,8 @@
    <widget class="QTableView" name="tableView">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>80</y>
+      <x>40</x>
+      <y>50</y>
       <width>256</width>
       <height>192</height>
      </rect>
@@ -88,6 +88,29 @@
     </property>
     <property name="text">
      <string>Add Customer</string>
+    </property>
+   </widget>
+   <widget class="QTableView" name="rentalTableView">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>260</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="assignRentalButton">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>290</y>
+      <width>93</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Assign Rental</string>
     </property>
    </widget>
   </widget>

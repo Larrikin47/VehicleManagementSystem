@@ -33,6 +33,10 @@ set(PROJECT_SOURCES
     addcustomerdialog.cpp      #
     addcustomerdialog.h
     addcustomerdialog.ui
+    addrentaldialog.cpp       #
+    addrentaldialog.h         #
+    addrentaldialog.ui        #
+
 )
 
 # 🏗 Build configuration depending on Qt version
