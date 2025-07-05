@@ -17,12 +17,13 @@ void RentalManager::createTables() {
                "rate REAL NOT NULL, "
                "status TEXT NOT NULL)");
 
-    // Rentals table
+    // Rentals table with rental_date and date_returned
     query.exec("CREATE TABLE IF NOT EXISTS rentals ("
                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                "customer_id INTEGER NOT NULL, "
                "vehicle_id INTEGER NOT NULL, "
-               "rental_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+               "rental_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+               "date_returned TIMESTAMP)");
 }
 
 QSqlQueryModel* RentalManager::getAllVehiclesModel() {
@@ -38,16 +39,18 @@ QSqlQueryModel* RentalManager::getAllVehiclesModel() {
 QSqlQueryModel* RentalManager::getAllRentalsModel() {
     auto *model = new QSqlQueryModel;
     model->setQuery(R"(
-        SELECT rentals.id, customers.name AS customer, vehicles.name AS vehicle, rental_date
+        SELECT rentals.id, customers.name AS customer, vehicles.name AS vehicle,
+               rentals.rental_date, rentals.date_returned
         FROM rentals
         JOIN customers ON rentals.customer_id = customers.id
         JOIN vehicles ON rentals.vehicle_id = vehicles.id
-        ORDER BY rental_date DESC
+        ORDER BY rentals.rental_date DESC
     )", m_db);
     model->setHeaderData(0, Qt::Horizontal, "Rental ID");
     model->setHeaderData(1, Qt::Horizontal, "Customer");
     model->setHeaderData(2, Qt::Horizontal, "Vehicle");
-    model->setHeaderData(3, Qt::Horizontal, "Date");
+    model->setHeaderData(3, Qt::Horizontal, "Date Rented");
+    model->setHeaderData(4, Qt::Horizontal, "Date Returned");
     return model;
 }
 
@@ -73,11 +76,19 @@ bool RentalManager::registerRental(int customerId, int vehicleId) {
     // First: update the vehicle's status
     query.prepare("UPDATE vehicles SET status = 'Rented' WHERE id = ?");
     query.addBindValue(vehicleId);
-    if (!query.exec()) return false;
+    if (!query.exec()) {
+        qWarning() << "Failed to update vehicle status:" << query.lastError().text();
+        return false;
+    }
 
     // Then: insert into rentals table
     query.prepare("INSERT INTO rentals (customer_id, vehicle_id) VALUES (?, ?)");
     query.addBindValue(customerId);
     query.addBindValue(vehicleId);
-    return query.exec();
+    if (!query.exec()) {
+        qWarning() << "Failed to register rental:" << query.lastError().text();
+        return false;
+    }
+
+    return true;
 }
